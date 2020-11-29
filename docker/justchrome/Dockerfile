@@ -36,7 +36,7 @@ ENV PULSE_SERVER /home/chrome/pulse
 #COPY --chown=chrome:chrome env/start.sh /home/chrome/
 
 COPY duckduckgo.json /etc/opt/chrome/policies/recommended/duckduckgo.json
-COPY ExtensionSettings.json /etc/opt/chrome/policies/managed/ExtensionSettings.json
+COPY extensions.json /etc/opt/chrome/policies/managed/extensions.json
 
 WORKDIR /home/chrome
 ENTRYPOINT [ "/home/chrome/start.sh" ]
