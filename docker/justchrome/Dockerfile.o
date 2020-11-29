@@ -1,0 +1,37 @@
+#build as
+#docker build -t len/justchrome:1.0  .
+#
+#run as
+#docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v $HOME/Downloads/chrome:/home/chrome/Downloads -v /run/user/$UID/pulse/native:/home/chrome/pulse -v /dev/shm:/dev/shm --security-opt=seccomp=chrome.json  --name facebook len/chrome
+
+#docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v $HOME/Downloads/chrome:/home/chrome/Downloads -v /run/user/$UID/pulse/native:/home/chrome/pulse -v /dev/shm:/dev/shm --security-opt=seccomp=chrome.json --device /dev/dri --name chrome len/chrome
+
+FROM ubuntu:20.04
+MAINTAINER len@len.ro
+
+RUN apt-get update && apt-get install -y wget pulseaudio gnupg && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && apt-get update && apt-get upgrade -y && apt-get install -y google-chrome-stable
+
+#install google-chrome
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y xterm nxproxy libnx-x11-6 libnxcl-bin
+#nxagent xpra xserver-xorg-video-dummy fluxbox
+
+#RUN apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:phoerious/keepassxc && apt-get update && apt-get install -y keepassxc fluxbox libsecret-1.0 gnome-keyring dbus dbus-user-session dbus-x11 xterm
+
+#RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4
+#RUN wget -c https://go.skype.com/skypeforlinux-64.deb && dpkg -i skypeforlinux-64.deb
+
+RUN rm -rf /var/cache/apt/archives/*
+
+RUN useradd -m -s /bin/bash -u 1000 chrome
+
+#RUN mkdir -p /home/chrome/.config/google-chrome && touch /home/chrome/.config/google-chrome/"First Run" && chown -R chrome /home/chrome
+
+USER chrome
+ENV PULSE_SERVER /home/chrome/pulse
+#COPY --chown=chrome:chrome env/start.sh /home/chrome/
+
+WORKDIR /home/chrome
+ENTRYPOINT [ "/home/chrome/start.sh" ]
+
+#ENTRYPOINT [ "/usr/bin/google-chrome" ]
+

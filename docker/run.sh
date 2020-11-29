@@ -5,7 +5,6 @@ cd $RUNDIR
 
 #config
 DISPLAY_NO=700
-BASE_PATH=$HOME/Private/contained
 DOCKER_USER=chrome
 
 #params
@@ -14,13 +13,14 @@ TEMP_RUN=false
 INSTANCE_NAME=chrome
 RUN_SCRIPT=chrome.sh
 
-while getopts 'i:tn:s:' c
+while getopts 'i:tn:s:b:' c
 do
   case $c in
     i) DOCKER_IMAGE=$OPTARG ;;
     t) TEMP_RUN=true ;;
     n) INSTANCE_NAME=$OPTARG ;;
     s) RUN_SCRIPT=$OPTARG ;;
+    b) BASE_PATH=$OPTARG ;;
   esac
 done
 
@@ -52,16 +52,18 @@ if [ "x$TEMP_RUN" = "xtrue" ]; then
     INSTANCE_NAME=disposable-$DISPLAY_NO
 fi
 
-mkdir -p $BASE_PATH/$INSTANCE_NAME
-cp $RUN_SCRIPT $BASE_PATH/$INSTANCE_NAME/start.sh
+STORAGE_DIR=$BASE_PATH/storage/$INSTANCE_NAME
 
-echo Running $RUN_SCRIPT from $BASE_PATH/$INSTANCE_NAME
+mkdir -p $STORAGE_DIR
+cp $RUN_SCRIPT $STORAGE_DIR/start.sh
+
+echo "Running in docker $RUN_SCRIPT from $STORAGE_DIR"
 
 cleanup_exit(){
     sleep 1
     kill $XNEST_PID
     if [ "x$TEMP_RUN" = "xtrue" ]; then
-	rm -rf $BASE_PATH/$INSTANCE_NAME
+	    rm -rf $STORAGE_DIR
     fi
     sudo rm -rf /tmp/.X11-unix/X$DISPLAY_NO
     echo All clean!
@@ -69,6 +71,6 @@ cleanup_exit(){
 
 trap "cleanup_exit" SIGINT SIGQUIT SIGTERM EXIT
 
-docker run -it -v /tmp/.X11-unix/X$DISPLAY_NO:/tmp/.X11-unix/X$DISPLAY_NO -e DISPLAY=$DISPLAY -v /run/user/$UID/pulse/native:/home/$DOCKER_USER/pulse -v $BASE_PATH/$INSTANCE_NAME:/home/$DOCKER_USER --security-opt=seccomp=chrome.json --device /dev/dri --name $INSTANCE_NAME -h $INSTANCE_NAME --rm $DOCKER_IMAGE
+docker run -it -v /tmp/.X11-unix/X$DISPLAY_NO:/tmp/.X11-unix/X$DISPLAY_NO -e DISPLAY=$DISPLAY -v /run/user/$UID/pulse/native:/home/$DOCKER_USER/pulse -v $STORAGE_DIR:/home/$DOCKER_USER --security-opt=seccomp=chrome.json --device /dev/dri --name $INSTANCE_NAME -h $INSTANCE_NAME --rm $DOCKER_IMAGE
 
 #-v /run/user/$UID/org.keepassxc.KeePassXC.BrowserServer:/tmp/runtime-chrome/org.keepassxc.KeePassXC.BrowserServer

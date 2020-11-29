@@ -6,16 +6,13 @@
 FROM ubuntu:20.04
 MAINTAINER len@len.ro
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y wget pulseaudio gnupg
-
 #install google-chrome
-RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && apt-get update && apt-get install -y google-chrome-stable
+RUN apt-get update && apt-get install -y wget pulseaudio gnupg && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && apt-get update && apt-get upgrade -y && apt-get install -y google-chrome-stable
 
 #install other stuff
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y xterm dbus dbus-user-session dbus-x11 nxproxy libnx-x11-6 libnxcl-bin  
-
-#xpra: xpra xserver-xorg-video-dummy
-#wm: fluxbox, openbox
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y xterm nxproxy libnx-x11-6 libnxcl-bin
+#nxagent xpra xserver-xorg-video-dummy fluxbox
+#dbus: dbus dbus-user-session dbus-x11
 
 #install keepassxc
 #RUN add-apt-repository ppa:phoerious/keepassxc && apt-get update && apt-get install -y keepassxc
@@ -28,15 +25,18 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y xterm dbus dbus-user-sessi
 #clean
 RUN rm -rf /var/cache/apt/archives/*
 
-RUN useradd -m -s /bin/bash -u 1000 sandbox
+RUN useradd -m -s /bin/bash -u 1000 chrome
 
 #disable first run message
-#RUN mkdir -p /home/sandbox/.config/google-chrome && touch /home/sandbox/.config/google-chrome/"First Run" && chown -R chrome /home/chrome
+#RUN mkdir -p /home/chrome/.config/google-chrome && touch /home/chrome/.config/google-chrome/"First Run" && chown -R chrome /home/chrome
 
-USER sandbox
-ENV PULSE_SERVER /home/sandbox/pulse
+USER chrome
+ENV PULSE_SERVER /home/chrome/pulse
 
-#COPY --chown=sandbox:sandbox start.sh /home/sandbox/
+#COPY --chown=chrome:chrome env/start.sh /home/chrome/
 
-WORKDIR /home/sandbox
-ENTRYPOINT [ "/home/sandbox/start.sh" ]
+COPY duckduckgo.json /etc/opt/chrome/policies/recommended/duckduckgo.json
+COPY ExtensionSettings.json /etc/opt/chrome/policies/managed/ExtensionSettings.json
+
+WORKDIR /home/chrome
+ENTRYPOINT [ "/home/chrome/start.sh" ]
