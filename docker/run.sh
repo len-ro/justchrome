@@ -13,7 +13,7 @@ TEMP_RUN=false
 INSTANCE_NAME=chrome
 RUN_SCRIPT=chrome.sh
 
-while getopts 'i:tn:s:b:' c
+while getopts 'i:tn:s:b:k' c
 do
   case $c in
     i) DOCKER_IMAGE=$OPTARG ;;
@@ -21,6 +21,7 @@ do
     n) INSTANCE_NAME=$OPTARG ;;
     s) RUN_SCRIPT=$OPTARG ;;
     b) BASE_PATH=$OPTARG ;;
+    k) KEEPASSXC=true ;;
   esac
 done
 
@@ -40,7 +41,7 @@ done
 #Xephyr :$DISPLAY_NO -screen 1400x1000 -resizeable -extension MIT-SHM -noreset -terminate &
 #Xephyr :$DISPLAY_NO -ac -fullscreen -extension MIT-SHM -noreset -terminate &
 
-nxagent :$DISPLAY_NO -ac -R -noshmem &
+nxagent :$DISPLAY_NO -ac -R -noshmem -noreset -norootlessexit &
 XNEST_PID="$!"
 echo Started X $XNEST_PID on display $DISPLAY_NO
 
@@ -57,9 +58,15 @@ STORAGE_DIR=$BASE_PATH/storage/$INSTANCE_NAME
 mkdir -p $STORAGE_DIR
 cp $RUN_SCRIPT $STORAGE_DIR/start.sh
 
+if [ "x$KEEPASSXC" = "xtrue" ]; then
+    echo Enabling keepassxc-browser
+    cp org.keepassxc.keepassxc_browser.json $STORAGE_DIR/.config/google-chrome/NativeMessagingHosts
+fi
+
 echo "Running in docker $RUN_SCRIPT from $STORAGE_DIR"
 
 cleanup_exit(){
+    echo Cleanup called
     sleep 1
     kill $XNEST_PID
     if [ "x$TEMP_RUN" = "xtrue" ]; then
@@ -71,6 +78,6 @@ cleanup_exit(){
 
 trap "cleanup_exit" SIGINT SIGQUIT SIGTERM EXIT
 
-docker run -it -v /tmp/.X11-unix/X$DISPLAY_NO:/tmp/.X11-unix/X$DISPLAY_NO -e DISPLAY=$DISPLAY -v /run/user/$UID/pulse/native:/home/$DOCKER_USER/pulse -v $STORAGE_DIR:/home/$DOCKER_USER --security-opt=seccomp=chrome.json --device /dev/dri --name $INSTANCE_NAME -h $INSTANCE_NAME --rm $DOCKER_IMAGE
+docker run -v /tmp/.X11-unix/X$DISPLAY_NO:/tmp/.X11-unix/X$DISPLAY_NO -e DISPLAY=$DISPLAY -v /run/user/$UID/pulse/native:/home/$DOCKER_USER/pulse -v $STORAGE_DIR:/home/$DOCKER_USER -v /run/user/$UID/org.keepassxc.KeePassXC.BrowserServer:/tmp/runtime-chrome/org.keepassxc.KeePassXC.BrowserServer --security-opt=seccomp=chrome.json --device /dev/dri --name $INSTANCE_NAME -h $INSTANCE_NAME --rm $DOCKER_IMAGE
 
 #-v /run/user/$UID/org.keepassxc.KeePassXC.BrowserServer:/tmp/runtime-chrome/org.keepassxc.KeePassXC.BrowserServer

@@ -1,22 +1,27 @@
 {
     "ExtensionSettings": {
         "*": {
-            "installation_mode": "blocked"
+            "installation_mode": "allowed"
         },
         "cfhdojbkjhnklbpkdaibdccddilifddb": {
             "installation_mode": "force_installed",
-            "update_url":
-            "https://clients2.google.com/service/update2/crx"
+            "update_url": "https://clients2.google.com/service/update2/crx"
         },
         "mlomiejdfkolichcflejclcbmpeaniij": {
             "installation_mode": "normal_installed",
-            "update_url":
-                "https://clients2.google.com/service/update2/crx"
+            "update_url": "https://clients2.google.com/service/update2/crx"
         },
         "bkkbcggnhapdmkeljlodobbkopceiche": {
             "installation_mode": "normal_installed",
-            "update_url":
-                "https://clients2.google.com/service/update2/crx"
+            "update_url": "https://clients2.google.com/service/update2/crx"
+        },
+        "lcknjpenlfdlffeafcadkbjfodmmgdip": {
+            "installation_mode": "normal_installed",
+            "update_url": "https://clients2.google.com/service/update2/crx"
+        },
+        "oboonakemofpalcgghocfoadofidjkkk": {
+            "installation_mode": "normal_installed",
+            "update_url": "https://clients2.google.com/service/update2/crx"
         }
     },
     "RestoreOnStartup": 1,

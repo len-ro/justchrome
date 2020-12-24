@@ -15,9 +15,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y xterm nx
 #dbus: dbus dbus-user-session dbus-x11
 
 #install keepassxc
-#RUN add-apt-repository ppa:phoerious/keepassxc && apt-get update && apt-get install -y keepassxc
-
-#RUN apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:phoerious/keepassxc && apt-get update && apt-get install -y keepassxc libsecret-1.0 gnome-keyring dbus dbus-user-session dbus-x11
+RUN apt-get install -y software-properties-common && add-apt-repository ppa:phoerious/keepassxc && apt-get update && apt-get install -y keepassxc
 
 #install skype
 #RUN apt-get install -y libsecret-1.0 gnome-keyring libxss1 && wget -c https://go.skype.com/skypeforlinux-64.deb && dpkg -i skypeforlinux-64.deb
@@ -35,6 +33,7 @@ ENV PULSE_SERVER /home/chrome/pulse
 
 #COPY --chown=chrome:chrome env/start.sh /home/chrome/
 
+#chrome settings
 COPY duckduckgo.json /etc/opt/chrome/policies/recommended/duckduckgo.json
 COPY extensions.json /etc/opt/chrome/policies/managed/extensions.json
 
