@@ -78,6 +78,6 @@ cleanup_exit(){
 
 trap "cleanup_exit" SIGINT SIGQUIT SIGTERM EXIT
 
-docker run -v /tmp/.X11-unix/X$DISPLAY_NO:/tmp/.X11-unix/X$DISPLAY_NO -e DISPLAY=$DISPLAY -v /run/user/$UID/pulse/native:/home/$DOCKER_USER/pulse -v $STORAGE_DIR:/home/$DOCKER_USER -v /run/user/$UID/org.keepassxc.KeePassXC.BrowserServer:/tmp/runtime-chrome/org.keepassxc.KeePassXC.BrowserServer --security-opt=seccomp=chrome.json --device /dev/dri --name $INSTANCE_NAME -h $INSTANCE_NAME --rm $DOCKER_IMAGE
+docker run -v /tmp/.X11-unix/X$DISPLAY_NO:/tmp/.X11-unix/X$DISPLAY_NO -e DISPLAY=$DISPLAY -v /run/user/$UID/pulse/native:/home/$DOCKER_USER/pulse -v $STORAGE_DIR:/home/$DOCKER_USER -v /run/user/$UID/org.keepassxc.KeePassXC.BrowserServer:/tmp/org.keepassxc.KeePassXC.BrowserServer --security-opt=seccomp=chrome.json --device /dev/dri --name $INSTANCE_NAME -h $INSTANCE_NAME --rm $DOCKER_IMAGE
 
 #-v /run/user/$UID/org.keepassxc.KeePassXC.BrowserServer:/tmp/runtime-chrome/org.keepassxc.KeePassXC.BrowserServer
