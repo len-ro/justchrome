@@ -20,6 +20,10 @@ RUN apt-get install -y software-properties-common && add-apt-repository ppa:phoe
 #install skype
 #RUN apt-get install -y libsecret-1.0 gnome-keyring libxss1 && wget -c https://go.skype.com/skypeforlinux-64.deb && dpkg -i skypeforlinux-64.deb
 
+#set timezone
+ENV TZ=Europe/Bucharest
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 #clean
 RUN rm -rf /var/cache/apt/archives/*
 
